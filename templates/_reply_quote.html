@@ -1,0 +1,15 @@
+{# Quoted reply preview inside a message bubble, expects m.reply_to #}
+{% if m.reply_to %}
+<div class="msg-reply-quote{% if m.reply_to.unavailable %} unavailable{% endif %}"
+     role="button"
+     tabindex="0"
+     data-reply-target="{{ m.reply_to.message_id }}"
+     {% if m.reply_to.unavailable %}data-unavailable="1"{% endif %}
+     title="Jump to message">
+  <span class="msg-reply-sender">{{ m.reply_to.sender_label or 'Message' }}</span>
+  <span class="msg-reply-text">
+    {% if m.reply_to.msg_type == 'image' %}📷 {% elif m.reply_to.msg_type == 'file' %}📎 {% endif %}
+    {{ m.reply_to.text }}
+  </span>
+</div>
+{% endif %}

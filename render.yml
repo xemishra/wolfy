@@ -1,0 +1,50 @@
+services:
+  - type: web
+    name: wolfy
+    runtime: python
+    plan: free
+    branch: main
+    autoDeploy: true
+
+    buildCommand: pip install -r requirements.txt
+
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+
+    envVars:
+      - key: ENV
+        value: production
+
+      - key: COOKIE_SECURE
+        value: true
+
+      - key: ALLOW_LOCAL_MONGO
+        value: false
+
+      - key: MAX_MESSAGE_LEN
+        value: 10000
+
+      - key: MONGO_URL
+        sync: false
+
+      - key: DB_NAME
+        sync: false
+
+      - key: SECRET_KEY
+        generateValue: true
+
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+
+      - key: FIREBASE_API_KEY
+        sync: false
+
+      - key: FIREBASE_AUTH_DOMAIN
+        sync: false
+
+      - key: FIREBASE_APP_ID
+        sync: false
+
+      - key: RESEND_API_KEY
+        sync: false
+
+    healthCheckPath: /health

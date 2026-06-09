@@ -1,16 +1,7 @@
 from fastapi import APIRouter
 
-from app.api.routes import (
-    auth,
-    chat,
-    files,
-    health,
-    legal,
-    pages,
-    profile,
-    seo,
-    websocket,
-)
+from app.api.routes import (auth, chat, files, health, legal, pages, profile,
+                            seo, websocket)
 
 api_router = APIRouter()
 

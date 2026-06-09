@@ -2,8 +2,7 @@ import logging
 
 from app.config import MAX_MESSAGE_LEN
 from app.core.database import db
-from app.services.chat import (can_send_message, mark_read, total_unread,
-                               unread_map)
+from app.services.chat import can_send_message, mark_read, total_unread, unread_map
 from app.services.matchmaker import matchmaker
 from app.services.messages import deliver_message
 from app.services.websocket_manager import manager

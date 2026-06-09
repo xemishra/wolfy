@@ -1,8 +1,14 @@
 from fastapi import Request
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 
-from app.config import (COOKIE_SECURE, FIREBASE_API_KEY, FIREBASE_APP_ID,
-                        FIREBASE_AUTH_DOMAIN, FIREBASE_PROJECT_ID, SECRET_KEY)
+from app.config import (
+    COOKIE_SECURE,
+    FIREBASE_API_KEY,
+    FIREBASE_APP_ID,
+    FIREBASE_AUTH_DOMAIN,
+    FIREBASE_PROJECT_ID,
+    SECRET_KEY,
+)
 from app.core.database import db
 from app.services.auth import verify_token
 from app.services.chat import build_contacts, total_unread

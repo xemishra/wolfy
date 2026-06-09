@@ -7,7 +7,8 @@ from app.core.database import db
 from app.dependencies.session import user_for_ws
 from app.services.chat import total_unread, unread_map
 from app.services.matchmaker import matchmaker
-from app.services.websocket_handlers import end_random_disconnect, handle_ws_message
+from app.services.websocket_handlers import (end_random_disconnect,
+                                             handle_ws_message)
 from app.services.websocket_manager import manager
 
 logger = logging.getLogger(__name__)

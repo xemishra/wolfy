@@ -1,0 +1,21 @@
+{# Message bubble content, expects m with msg_type, text, attachment, optional reply_to #}
+<div class="msg-bubble{% if m.msg_type == 'image' %} msg-bubble-media{% elif m.msg_type == 'file' %} msg-bubble-file{% endif %}">
+  {% include "_reply_quote.html" %}
+  {% if m.msg_type == 'image' and m.attachment %}
+    <a href="/api/files/{{ m.attachment.file_id }}" target="_blank" rel="noopener">
+      <img class="msg-image" src="/api/files/{{ m.attachment.file_id }}" alt="{{ m.attachment.filename }}" loading="lazy"/>
+    </a>
+    {% if m.text %}<div class="msg-caption">{{ m.text }}</div>{% endif %}
+  {% elif m.msg_type == 'file' and m.attachment %}
+    <a class="msg-file-card" href="/api/files/{{ m.attachment.file_id }}" target="_blank" rel="noopener">
+      <span class="msg-file-icon">📎</span>
+      <span class="msg-file-meta">
+        <span class="msg-file-name">{{ m.attachment.filename }}</span>
+        <span class="msg-file-size">{% if m.attachment.size %}{{ (m.attachment.size / 1024)|round(1) }} KB{% endif %}</span>
+      </span>
+    </a>
+    {% if m.text %}<div class="msg-caption">{{ m.text }}</div>{% endif %}
+  {% else %}
+    <span class="msg-text">{{ m.text }}</span>
+  {% endif %}
+</div>

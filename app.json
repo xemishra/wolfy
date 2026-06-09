@@ -1,0 +1,89 @@
+{
+  "name": "Wolfy",
+  "description": "Modern social platform built with FastAPI, MongoDB, Firebase Authentication, and JWT-based security infrastructure.",
+  "repository": "https://github.com/xemishra/wolfy",
+  "logo": "https://wolfy.online/assets/icon.png",
+  "keywords": [
+    "fastapi",
+    "python",
+    "mongodb",
+    "firebase-auth",
+    "jwt-authentication",
+    "social-platform",
+    "websocket",
+    "api",
+    "wolfy"
+  ],
+  "website": "https://wolfy.online",
+  "success_url": "/",
+  "stack": "container",
+  "env": {
+    "ENV": {
+      "description": "Application environment",
+      "value": "production"
+    },
+    "HOST": {
+      "description": "Application host",
+      "value": "0.0.0.0"
+    },
+    "PORT": {
+      "description": "Application port",
+      "value": "8000"
+    },
+    "MONGO_URL": {
+      "description": "MongoDB connection URL",
+      "required": true
+    },
+    "DB_NAME": {
+      "description": "MongoDB database name",
+      "required": true
+    },
+    "SECRET_KEY": {
+      "description": "JWT secret key used for authentication",
+      "generator": "secret"
+    },
+    "COOKIE_SECURE": {
+      "description": "Enable secure cookies in production",
+      "value": "true"
+    },
+    "FIREBASE_PROJECT_ID": {
+      "description": "Firebase project ID",
+      "required": true
+    },
+    "FIREBASE_API_KEY": {
+      "description": "Firebase API key",
+      "required": true
+    },
+    "FIREBASE_AUTH_DOMAIN": {
+      "description": "Firebase authentication domain",
+      "required": true
+    },
+    "FIREBASE_APP_ID": {
+      "description": "Firebase application ID",
+      "required": true
+    },
+    "RESEND_API_KEY": {
+      "description": "Resend email service API key",
+      "required": false
+    },
+    "MAX_MESSAGE_LEN": {
+      "description": "Maximum allowed message length",
+      "value": "10000"
+    },
+    "ALLOW_LOCAL_MONGO": {
+      "description": "Allow local MongoDB usage",
+      "value": "false"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ]
+}

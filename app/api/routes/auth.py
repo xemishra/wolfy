@@ -7,10 +7,14 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from pymongo.errors import DuplicateKeyError
 
 from app.core.database import db
-from app.dependencies.session import (clear_pending_cookie,
-                                      clear_session_cookie, get_pending,
-                                      set_pending_cookie, set_session,
-                                      template_ctx)
+from app.dependencies.session import (
+    clear_pending_cookie,
+    clear_session_cookie,
+    get_pending,
+    set_pending_cookie,
+    set_session,
+    template_ctx,
+)
 from app.dependencies.templates import templates
 from app.services.auth import verify_token
 from app.services.email import send_welcome_email

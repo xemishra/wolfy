@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Wolfy - Set Up Account</title>
+  <link rel="icon" href="/assets/icon.png" type="image/png"/>
+  <link rel="stylesheet" href="/static/css/main.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body class="auth-body">
+
+<div class="bg-grid"></div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<div class="auth-wrap">
+
+  {% if error %}
+    <div class="alert" style="margin-bottom:16px">{{ error }}</div>
+  {% endif %}
+
+  <div class="auth-card step-card {% if not error %}active{% endif %}" id="step1">
+    <div class="step-pip">
+      <div class="pip active"></div><div class="pip"></div><div class="pip"></div>
+    </div>
+    <h2>Pick a username</h2>
+    <p class="sub">This is how others will find you</p>
+    <div class="input-row">
+      <span class="prefix">@</span>
+      <input id="usernameInput" class="field" type="text"
+             placeholder="cooluser" maxlength="20" autocomplete="off"
+             value="{{ username_value or '' }}"/>
+    </div>
+    <div class="hint" id="usernameHint"></div>
+    <button class="primary-btn" id="step1Btn">Continue →</button>
+  </div>
+
+
+  <div class="auth-card step-card" id="step2">
+    <div class="step-pip">
+      <div class="pip done"></div><div class="pip active"></div><div class="pip"></div>
+    </div>
+    <h2>What's your name?</h2>
+    <p class="sub">Shown in your conversations</p>
+    <input id="nameInput" class="field" type="text"
+           placeholder="Your display name" maxlength="30"/>
+    <button class="primary-btn" id="step2Btn">Continue →</button>
+  </div>
+
+  <div class="auth-card step-card" id="step3">
+    <div class="step-pip">
+      <div class="pip done"></div><div class="pip done"></div><div class="pip active"></div>
+    </div>
+    <h2>Date of birth</h2>
+    <p class="sub">You must be 13+ to use Wolfy</p>
+
+    <form method="POST" action="/onboard/register" id="registerForm">
+      <input type="hidden" name="username"     id="hiddenUsername"/>
+      <input type="hidden" name="display_name" id="hiddenName"/>
+      <input id="dobInput" class="field" type="date" name="dob" required/>
+      <button type="submit" class="primary-btn" style="margin-top:12px">
+        Create Account
+      </button>
+    </form>
+    <p class="err-msg hidden" id="dobErr"></p>
+  </div>
+
+  <div class="auth-card step-card center" id="stepLoading">
+    <div class="spinner"></div>
+    <p class="sub" style="margin-top:16px">Setting up your account…</p>
+  </div>
+
+</div>
+
+<script>
+  let tempData = {};
+
+  function showStep(id) {
+    document.querySelectorAll('.step-card').forEach(c => c.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  const usernameInput = document.getElementById('usernameInput');
+  const usernameHint  = document.getElementById('usernameHint');
+  let   timer;
+
+  usernameInput.addEventListener('input', () => {
+    let v = usernameInput.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    usernameInput.value = v;
+    clearTimeout(timer);
+    if (v.length < 3) {
+      usernameHint.textContent = v ? 'At least 3 characters' : '';
+      usernameHint.className   = 'hint err';
+      return;
+    }
+    usernameHint.textContent = 'Checking…';
+    usernameHint.className   = 'hint';
+    timer = setTimeout(async () => {
+      const r = await fetch(`/onboard/check-username?username=${v}`);
+      const d = await r.json();
+      usernameHint.textContent = d.available ? '✓ Available!' : '✗ Already taken';
+      usernameHint.className   = 'hint ' + (d.available ? 'ok' : 'err');
+    }, 450);
+  });
+
+  document.getElementById('step1Btn').onclick = () => {
+    if (!usernameHint.classList.contains('ok')) return;
+    tempData.username = usernameInput.value.trim();
+    showStep('step2');
+  };
+
+  document.getElementById('step2Btn').onclick = () => {
+    const v = document.getElementById('nameInput').value.trim();
+    if (!v) return;
+    tempData.display_name = v;
+    showStep('step3');
+  };
+
+  document.getElementById('registerForm').addEventListener('submit', e => {
+    const dob = document.getElementById('dobInput').value;
+    const err = document.getElementById('dobErr');
+    if (!dob) {
+      e.preventDefault();
+      err.textContent = 'Please enter your date of birth';
+      err.classList.remove('hidden');
+      return;
+    }
+    const age = (Date.now() - new Date(dob)) / (365.25 * 24 * 3600 * 1000);
+    if (age < 13) {
+      e.preventDefault();
+      err.textContent = 'You must be at least 13 years old';
+      err.classList.remove('hidden');
+      return;
+    }
+
+    document.getElementById('hiddenUsername').value = tempData.username     || '';
+    document.getElementById('hiddenName').value     = tempData.display_name || '';
+    showStep('stepLoading');
+
+  });
+
+  {% if error %}
+    showStep('step1');
+  {% endif %}
+</script>
+</body>
+</html>

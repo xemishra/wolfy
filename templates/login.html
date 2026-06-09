@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Wolfy - Login</title>
+  <link rel="icon" href="/assets/icon.png" type="image/png"/>
+  <link rel="stylesheet" href="/static/css/main.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body class="auth-body">
+
+<div class="bg-grid"></div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<div class="auth-wrap">
+  <div class="auth-card">
+
+    <div class="logo">
+      <div class="logo-icon">
+        <img src="/assets/icon.png" alt=""/>
+      </div>
+      <span>Wolfy</span>
+    </div>
+
+    <h1>Meet strangers.<br/><span class="grad">Talk freely.</span></h1>
+    <p class="sub">Connect with random people. Keep the ones you vibe with.</p>
+
+    {% if error %}
+      <div class="alert">{{ error }}</div>
+    {% endif %}
+
+    <button class="google-btn" id="googleBtn">
+      <svg width="20" height="20" viewBox="0 0 48 48">
+        <path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33.3 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 2.9l5.7-5.7C34.2 6.5 29.4 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 20-8 20-20 0-1.3-.1-2.7-.4-4z"/>
+        <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 15.1 18.9 12 24 12c3.1 0 5.8 1.1 7.9 2.9l5.7-5.7C34.2 6.5 29.4 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/>
+        <path fill="#4CAF50" d="M24 44c5.2 0 10-1.9 13.6-5.1l-6.3-5.2C29.4 35.3 26.8 36 24 36c-5.2 0-9.5-3.3-11.2-8l-6.6 5.1C9.7 39.7 16.3 44 24 44z"/>
+        <path fill="#1976D2" d="M43.6 20H24v8h11.3c-.8 2.3-2.3 4.2-4.3 5.5l6.3 5.2C41.4 35.2 44 30 44 24c0-1.3-.1-2.7-.4-4z"/>
+      </svg>
+      Continue with Google
+    </button>
+
+    <form id="sessionForm" method="POST" action="/session/set" style="display:none">
+      <input type="hidden" name="id_token" id="idTokenInput"/>
+    </form>
+
+    <div class="spinner hidden" id="spinner"></div>
+    <p class="err-msg hidden" id="jsErr"></p>
+    <p class="terms">
+  © 2026 Wolfy. All rights reserved |
+  <a href="/terms" class="terms-link">Terms & Conditions</a>
+</p>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script>
+
+  firebase.initializeApp({{ firebase | tojson }});
+  const auth = firebase.auth();
+  const provider = new firebase.auth.GoogleAuthProvider();
+
+  function submitIdToken(token) {
+    document.getElementById('idTokenInput').value = token;
+    document.getElementById('sessionForm').submit();
+  }
+
+  function setLoading(on) {
+    const btn = document.getElementById('googleBtn');
+    const sp  = document.getElementById('spinner');
+    btn.disabled = on;
+    btn.style.opacity = on ? '0.6' : '1';
+    sp.classList.toggle('hidden', !on);
+  }
+
+  auth.getRedirectResult().then(async result => {
+    if (!result.user) return;
+    setLoading(true);
+    try {
+      const token = await result.user.getIdToken(true);
+      submitIdToken(token);
+    } catch (e) {
+      document.getElementById('jsErr').textContent = e.message || 'Sign-in failed. Try again.';
+      document.getElementById('jsErr').classList.remove('hidden');
+      setLoading(false);
+    }
+  }).catch(() => {});
+
+  document.getElementById('googleBtn').onclick = async () => {
+    const err = document.getElementById('jsErr');
+    setLoading(true);
+    err.classList.add('hidden');
+    try {
+      await auth.signInWithPopup(provider);
+      const token = await auth.currentUser.getIdToken(true);
+      submitIdToken(token);
+    } catch (e) {
+      const code = e.code || '';
+      if (code === 'auth/popup-blocked' || code === 'auth/operation-not-supported-in-this-environment') {
+        await auth.signInWithRedirect(provider);
+        return;
+      }
+      err.textContent = e.message || 'Sign-in failed. Try again.';
+      err.classList.remove('hidden');
+      setLoading(false);
+    }
+  };
+</script>
+</body>
+</html>
